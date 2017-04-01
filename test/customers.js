@@ -31,7 +31,7 @@ describe('Customers', () => {
 		done();
     });
 
-    describe('/DELETE all users', () => {
+    describe('/DELETE all API users', () => {
         it('it should delete all test API users', (done) => {
             chai.request(appServer)
             .delete('/users')
@@ -45,7 +45,7 @@ describe('Customers', () => {
         });
     });
 
-    describe('/POST add user', () => {
+    describe('/POST add new API user', () => {
         it('it should add new test API user', (done) => {
             var reqObj = {"reqData" : {"username": "mjtest","password": "mjtest"}};
             chai.request(appServer)
@@ -147,7 +147,7 @@ describe('Customers', () => {
         });
     });
 
-	describe('/GET customers', () => {
+	describe('/GET all customers details', () => {
 		it('it should GET all the customers', (done) => {
 			chai.request(appServer)
 			.get('/customers/all')
@@ -161,4 +161,37 @@ describe('Customers', () => {
 			});
 		});
 	});
+
+    describe('/GET a customer details', () => {
+        it('it should GET a customer detail based on customer_id specified', (done) => {
+            chai.request(appServer)
+            .get('/customers?customer_id='+uniq)
+            .set('X-access-token', authToken)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('type').eql('success');
+                res.body.should.have.property('code').to.be.oneOf(['S202','S205']);
+                done();
+            });
+        });
+    });
+
+    describe('/PUT modify a customer details', () => {
+        it('it should modify a customer detail based on customer_id specified', (done) => {
+			addUserObj.reqData.email = "sachin_mod_"+uniq+"@test.com";
+            chai.request(appServer)
+            .put('/customers')
+            .set('X-access-token', authToken)
+            .send(addUserObj)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('type').eql('success');
+                res.body.should.have.property('code').eql('S203');
+                done();
+            });
+        });
+    });
+
 });
